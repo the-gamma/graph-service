@@ -27,6 +27,9 @@ io.on('connection', function(socket){
     else if (msg == "nodes_of_type" ) {
       api.nodes_of_type("hero");
     }
+    else if (msg == "links_from_node" ) {
+      api.links_from_node("Luke");
+    }
     else{
       console.log("this query doesn't exist");
       io.emit('response', "this query doesn't exist");

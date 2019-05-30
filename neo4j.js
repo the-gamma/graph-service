@@ -60,10 +60,6 @@ function add_label(){
 }
 
 
-
-
-
-
 function All_nodes(){
 
   const resultPromise = session.run(
@@ -127,8 +123,49 @@ function nodes_of_type(label_type){
 
       jsonString += JSON.stringify(node_obj)
     }
-    var path = "./nodes_of_type"+ label_type + ".json";
+    var path = "./nodes_of_type_"+ label_type + ".json";
     fs.writeFile(path, jsonString, err => {
+    if (err) {
+        console.log('Error writing file', err)
+    } else {
+        console.log('Successfully wrote file')
+    }
+    })
+    driver.close();
+  });
+
+}
+
+function links_from_node(node_id){
+  add_label();
+  const resultPromise = session.run(
+    'MATCH (a {name: $label})-[r]-(b) RETURN type(r)',
+    {label: node_id}
+  );
+  resultPromise.then(result => {
+    session.close();
+    var jsonString = ""
+    for (var i = 0; i < result.records.length; i++) {
+      const singleRecord = result.records[i];
+      const node = singleRecord.get(0);
+      const node_obj = {
+        name: node,
+        returns:{"kind":"nested","endpoint":"links_from_node/"+node_id},
+      }
+
+      jsonString += JSON.stringify(node_obj) + ";";
+    }
+    var arr =  jsonString.slice(0, jsonString.length-1);
+    arr = arr.split(";");
+    let unique = [...new Set(arr)];
+    var nl = ""
+    for (var i = 0; i < unique.length; i++) {
+      nl += unique[i] + ",";
+    }
+
+
+    var path = "./links_from_node_"+ node_id + ".json";
+    fs.writeFile(path, "[" + nl.slice(0, nl.length-1) + "]", err => {
     if (err) {
         console.log('Error writing file', err)
     } else {
@@ -147,9 +184,8 @@ function nodes_of_type(label_type){
 
 
 
-
-
 exports.All_nodes = All_nodes;
 exports.test = test;
 exports.Age_by_name = Age_by_name;
 exports.nodes_of_type = nodes_of_type;
+exports.links_from_node = links_from_node;
