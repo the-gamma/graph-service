@@ -114,8 +114,6 @@ function links_from_node(node_id){
     for (var i = 0; i < unique.length; i++) {
       nl += unique[i] + ",";
     }
-
-
     var path = "./links_from_node_"+ node_id + ".json";
     fs.writeFile(path, "[" + nl.slice(0, nl.length-1) + "]", err => {
     if (err) {

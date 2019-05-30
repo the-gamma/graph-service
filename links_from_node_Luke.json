@@ -1,1 +1,0 @@
-[{"name":"FATHER","returns":{"kind":"nested","endpoint":"linked_from_node/Luke/FATHER"}},{"name":"TEACH","returns":{"kind":"nested","endpoint":"linked_from_node/Luke/TEACH"}},{"name":"FIGHT","returns":{"kind":"nested","endpoint":"linked_from_node/Luke/FIGHT"}},{"name":"LIVES_ON","returns":{"kind":"nested","endpoint":"linked_from_node/Luke/LIVES_ON"}}]
