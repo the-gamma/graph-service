@@ -12,8 +12,8 @@ app.get('/starwars', function(req, res) {
     api.All_nodes();
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile(__dirname + '/starwars.json');
-     }, 3000);
+      res.sendFile("__dirname" + '/json/starwars.json');
+    }, 3000);
 
 
 
@@ -23,24 +23,24 @@ app.get('/starwars/nodes_of_type/:type', function(req, res) {
     api.nodes_of_type(req.params.type);
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile(__dirname + '/nodes_of_type_'+ req.params.type +'.json');
-    }, 3000);
+      res.sendFile(__dirname + '/json/nodes_of_type_'+ req.params.type +'.json');
+    }, 1000);
 });
 
 app.get('/starwars/links_from_node/:node_id', function(req, res) {
     api.links_from_node(req.params.node_id);
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile(__dirname + '/links_from_node_'+ req.params.node_id +  '.json');
-      }, 3000);
+      res.sendFile(__dirname + '/json/links_from_node_'+ req.params.node_id +  '.json');
+    }, 1000);
 });
 
-app.get('/starwars/linked_from_node/:node-id/:relation', function(req, res) {
+app.get('/starwars/linked_from_node/:node_id/:relation', function(req, res) {
     api.linked_from_node(req.params.node_id, req.params.relation);
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile(__dirname + '/linked_from_node_'+req.params.node_id +'_'+ req.params.relation + '.json');
-    }, 3000);
+      res.sendFile(__dirname + '/json/linked_from_node_'+req.params.node_id +'_'+ req.params.relation + '.json');
+    }, 1000);
 });
 
 
@@ -75,6 +75,8 @@ io.on('connection', function(socket){
     console.log('user disconnected');
   });
 });
+
+
 
 http.listen(8000, function(){
   console.log('listening on *:8000');

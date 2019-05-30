@@ -43,7 +43,7 @@ function All_nodes(){
       nl += unique[i] + ",";
     }
 
-    fs.writeFile('./starwars.json', "[" + nl.slice(0, nl.length-1) + "]", err => {
+    fs.writeFile('./json/starwars.json', "[" + nl.slice(0, nl.length-1) + "]", err => {
     if (err) {
         console.log('Error writing file', err)
     } else {
@@ -62,7 +62,7 @@ function nodes_of_type(label_type){
   );
   resultPromise.then(result => {
     session.close();
-    var jsonString = ""
+    var jsonString = "";
     for (var i = 0; i < result.records.length; i++) {
       const singleRecord = result.records[i];
       const node = singleRecord.get(0);
@@ -73,10 +73,10 @@ function nodes_of_type(label_type){
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
       }
 
-      jsonString += JSON.stringify(node_obj)
+      jsonString += JSON.stringify(node_obj) +";";
     }
-    var path = "./nodes_of_type_"+ label_type + ".json";
-    fs.writeFile(path, jsonString, err => {
+    var path = "./json/nodes_of_type_"+ label_type + ".json";
+    fs.writeFile(path,  "["+ jsonString.slice(0, jsonString.length-1) + "]", err => {
     if (err) {
         console.log('Error writing file', err)
     } else {
@@ -96,13 +96,13 @@ function links_from_node(node_id){
   );
   resultPromise.then(result => {
     session.close();
-    var jsonString = ""
+    var jsonString = "";
     for (var i = 0; i < result.records.length; i++) {
       const singleRecord = result.records[i];
       const node = singleRecord.get(0);
       const node_obj = {
         name: node,
-        returns:{"kind":"nested","endpoint":"linked_from_node/"+ node_id + "/"+ node},
+        returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
       }
 
       jsonString += JSON.stringify(node_obj) + ";";
@@ -110,11 +110,11 @@ function links_from_node(node_id){
     var arr =  jsonString.slice(0, jsonString.length-1);
     arr = arr.split(";");
     let unique = [...new Set(arr)];
-    var nl = ""
+    var nl = "";
     for (var i = 0; i < unique.length; i++) {
       nl += unique[i] + ",";
     }
-    var path = "./links_from_node_"+ node_id + ".json";
+    var path = "./json/links_from_node_"+ node_id + ".json";
     fs.writeFile(path, "[" + nl.slice(0, nl.length-1) + "]", err => {
     if (err) {
         console.log('Error writing file', err)
@@ -134,7 +134,7 @@ function linked_from_node(name, link){
   );
   resultPromise.then(result => {
     session.close();
-    var jsonString = ""
+    var jsonString = "";
     for (var i = 0; i < result.records.length; i++) {
       const singleRecord = result.records[i];
       const node = singleRecord.get(0);
@@ -147,7 +147,7 @@ function linked_from_node(name, link){
 
       jsonString += JSON.stringify(node_obj) + ",";
     }
-    var path = "./linked_from_node_" +name + "_" +link + ".json";
+    var path = "./json/linked_from_node_" +name + "_" +link + ".json";
     fs.writeFile(path, "["+ jsonString.slice(0, jsonString.length-1) + "]", err => {
     if (err) {
         console.log('Error writing file', err)
