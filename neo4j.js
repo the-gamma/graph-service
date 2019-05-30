@@ -118,7 +118,7 @@ function nodes_of_type(label_type){
         id: node.identity,
         name: node.labels[0],
         properties: node.properties,
-        returns:{"kind":"nested","endpoint":"/nodes_of_type/"+node.labels},
+        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
       }
 
       jsonString += JSON.stringify(node_obj)
@@ -150,7 +150,7 @@ function links_from_node(node_id){
       const node = singleRecord.get(0);
       const node_obj = {
         name: node,
-        returns:{"kind":"nested","endpoint":"links_from_node/"+node_id},
+        returns:{"kind":"nested","endpoint":"linked_from_node/"+ node_id + "/"+ node},
       }
 
       jsonString += JSON.stringify(node_obj) + ";";
@@ -192,7 +192,7 @@ function linked_from_node(name, link){
         id: node.identity,
         name: node.labels[0],
         properties: node.properties,
-        returns:{"kind":"nested","endpoint":"/linked_from_node/"+name + "/"+link},
+        returns:{"kind":"nested","endpoint":"/links_from_node/"+name},
       }
 
       jsonString += JSON.stringify(node_obj) + ",";
