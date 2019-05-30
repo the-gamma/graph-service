@@ -30,6 +30,9 @@ io.on('connection', function(socket){
     else if (msg == "links_from_node" ) {
       api.links_from_node("Luke");
     }
+    else if (msg == "linked_from_node" ) {
+      api.linked_from_node("Luke","TEACH");
+    }
     else{
       console.log("this query doesn't exist");
       io.emit('response', "this query doesn't exist");

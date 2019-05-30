@@ -176,7 +176,39 @@ function links_from_node(node_id){
   });
 
 }
+function linked_from_node(name, link){
+  add_label();
+  const resultPromise = session.run(
+    'MATCH (a)-[r]-(b) WHERE type(r) = $link and a.name = $name RETURN b',
+    {name: name, link: link}
+  );
+  resultPromise.then(result => {
+    session.close();
+    var jsonString = ""
+    for (var i = 0; i < result.records.length; i++) {
+      const singleRecord = result.records[i];
+      const node = singleRecord.get(0);
+      const node_obj = {
+        id: node.identity,
+        name: node.labels[0],
+        properties: node.properties,
+        returns:{"kind":"nested","endpoint":"/linked_from_node/"+name + "/"+link},
+      }
 
+      jsonString += JSON.stringify(node_obj) + ",";
+    }
+    var path = "./linked_from_node_" +name + "_" +link + ".json";
+    fs.writeFile(path, "["+ jsonString.slice(0, jsonString.length-1) + "]", err => {
+    if (err) {
+        console.log('Error writing file', err)
+    } else {
+        console.log('Successfully wrote file')
+    }
+    })
+    driver.close();
+  });
+
+}
 
 
 
@@ -189,3 +221,4 @@ exports.test = test;
 exports.Age_by_name = Age_by_name;
 exports.nodes_of_type = nodes_of_type;
 exports.links_from_node = links_from_node;
+exports.linked_from_node = linked_from_node;
