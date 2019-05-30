@@ -4,54 +4,6 @@ const session = driver.session();
 const fs = require('fs')
 
 
-function test(personName){
-
-  const resultPromise = session.run(
-    'MERGE (a:Person {name: $name}) RETURN a',
-    {name: personName}
-  );
-
-  let res = resultPromise.then(result => {
-    session.close();
-
-    const singleRecord = result.records[0];
-    const node = singleRecord.get(0);
-    console.log(node.properties.name);
-    return node.properties.name;
-    // on application exit:
-    driver.close();
-
-  });
-  setTimeout(()=>{
-    console.log(res);
-    return res;
-  });
-
-}
-
-function Age_by_name(personName){
-
-  const resultPromise = session.run(
-    'MERGE (a:person {name: $name}) RETURN a ',
-    {name: personName}
-  );
-
-  resultPromise.then(result => {
-    session.close();
-
-    const singleRecord = result.records[0];
-    const node = singleRecord.get(0);
-    var age = node.properties.Age;
-    console.log(Number(age));
-    return Number(age);
-    // on application exit:
-    driver.close();
-  });
-
-}
-
-
-
 function add_label(){
   const resultPromise = session.run(
     'MATCH (n)  SET n.label = labels(n)[0]' ,
@@ -217,8 +169,6 @@ function linked_from_node(name, link){
 
 
 exports.All_nodes = All_nodes;
-exports.test = test;
-exports.Age_by_name = Age_by_name;
 exports.nodes_of_type = nodes_of_type;
 exports.links_from_node = links_from_node;
 exports.linked_from_node = linked_from_node;
