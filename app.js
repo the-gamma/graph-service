@@ -13,7 +13,7 @@ app.get('/starwars', function(req, res) {
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
       res.sendFile("__dirname" + '/json/starwars.json');
-    }, 3000);
+    }, 2000);
 
 
 
@@ -24,7 +24,7 @@ app.get('/starwars/nodes_of_type/:type', function(req, res) {
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
       res.sendFile(__dirname + '/json/nodes_of_type_'+ req.params.type +'.json');
-    }, 1000);
+    }, 2000);
 });
 
 app.get('/starwars/links_from_node/:node_id', function(req, res) {
@@ -32,7 +32,7 @@ app.get('/starwars/links_from_node/:node_id', function(req, res) {
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
       res.sendFile(__dirname + '/json/links_from_node_'+ req.params.node_id +  '.json');
-    }, 1000);
+    }, 2000);
 });
 
 app.get('/starwars/linked_from_node/:node_id/:relation', function(req, res) {
@@ -40,7 +40,7 @@ app.get('/starwars/linked_from_node/:node_id/:relation', function(req, res) {
     setTimeout(function(){
       res.setHeader('Content-Type', 'text/plain');
       res.sendFile(__dirname + '/json/linked_from_node_'+req.params.node_id +'_'+ req.params.relation + '.json');
-    }, 1000);
+    }, 2000);
 });
 
 
