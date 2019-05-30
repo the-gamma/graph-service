@@ -1,0 +1,1 @@
+[{"name":"hero","returns":{"kind":"nested","endpoint":"/nodes_of_type/hero"}},{"name":"planet","returns":{"kind":"nested","endpoint":"/nodes_of_type/planet"}},{"name":"enemy","returns":{"kind":"nested","endpoint":"/nodes_of_type/enemy"}},{"name":"Person","returns":{"kind":"nested","endpoint":"/nodes_of_type/Person"}}]

@@ -1,6 +1,7 @@
 const neo4j = require('neo4j-driver').v1;
 var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "azerty"));
 const session = driver.session();
+const fs = require('fs')
 
 
 function test(personName){
@@ -10,15 +11,20 @@ function test(personName){
     {name: personName}
   );
 
-  resultPromise.then(result => {
+  let res = resultPromise.then(result => {
     session.close();
 
     const singleRecord = result.records[0];
     const node = singleRecord.get(0);
-
     console.log(node.properties.name);
+    return node.properties.name;
     // on application exit:
     driver.close();
+
+  });
+  setTimeout(()=>{
+    console.log(res);
+    return res;
   });
 
 }
@@ -35,8 +41,9 @@ function Age_by_name(personName){
 
     const singleRecord = result.records[0];
     const node = singleRecord.get(0);
-
-    console.log(node.properties.Age);
+    var age = node.properties.Age;
+    console.log(Number(age));
+    return Number(age);
     // on application exit:
     driver.close();
   });
@@ -44,5 +51,105 @@ function Age_by_name(personName){
 }
 
 
+
+function add_label(){
+  const resultPromise = session.run(
+    'MATCH (n)  SET n.label = labels(n)[0]' ,
+  );
+
+}
+
+
+
+
+
+
+function All_nodes(){
+
+  const resultPromise = session.run(
+    'MATCH (n) RETURN n LIMIT 25',
+  );
+
+  resultPromise.then(result => {
+    session.close();
+    var jsonString = ""
+    for (var i = 0; i < result.records.length; i++) {
+      const singleRecord = result.records[i];
+      const node = singleRecord.get(0);
+      const node_obj = {
+        name: node.labels[0],
+        returns:{"kind":"nested","endpoint":"/nodes_of_type/"+node.labels},
+
+      }
+
+      jsonString += JSON.stringify(node_obj) + ";";
+
+
+
+    }
+    var arr =  jsonString.slice(0, jsonString.length-1);
+    arr = arr.split(";");
+    let unique = [...new Set(arr)];
+    var nl = ""
+    for (var i = 0; i < unique.length; i++) {
+      nl += unique[i] + ",";
+    }
+
+    fs.writeFile('./starwars.json', "[" + nl.slice(0, nl.length-1) + "]", err => {
+    if (err) {
+        console.log('Error writing file', err)
+    } else {
+        console.log('Successfully wrote file')
+    }
+    })
+    driver.close();
+  });
+
+}
+function nodes_of_type(label_type){
+  add_label();
+  const resultPromise = session.run(
+    'MATCH (n) WHERE n.label = $label RETURN n LIMIT 25',
+    {label: label_type}
+  );
+  resultPromise.then(result => {
+    session.close();
+    var jsonString = ""
+    for (var i = 0; i < result.records.length; i++) {
+      const singleRecord = result.records[i];
+      const node = singleRecord.get(0);
+      const node_obj = {
+        id: node.identity,
+        name: node.labels[0],
+        properties: node.properties,
+        returns:{"kind":"nested","endpoint":"/nodes_of_type/"+node.labels},
+      }
+
+      jsonString += JSON.stringify(node_obj)
+    }
+    var path = "./nodes_of_type"+ label_type + ".json";
+    fs.writeFile(path, jsonString, err => {
+    if (err) {
+        console.log('Error writing file', err)
+    } else {
+        console.log('Successfully wrote file')
+    }
+    })
+    driver.close();
+  });
+
+}
+
+
+
+
+
+
+
+
+
+
+exports.All_nodes = All_nodes;
 exports.test = test;
 exports.Age_by_name = Age_by_name;
+exports.nodes_of_type = nodes_of_type;
