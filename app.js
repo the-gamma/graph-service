@@ -4,47 +4,43 @@ var io = require('socket.io')(http);
 var api = require('./neo4j');
 
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/Index.html');
-});
-
 app.get('/starwars', function(req, res) {
-    api.All_nodes();
-    setTimeout(function(){
+    api.All_nodes().then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile("__dirname" + '/json/starwars.json');
-    }, 2000);
-
-
-
+      res.end(resultJson);
+    });
 });
 
 app.get('/starwars/nodes_of_type/:type', function(req, res) {
-    api.nodes_of_type(req.params.type);
-    setTimeout(function(){
+    api.nodes_of_type(req.params.type).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile(__dirname + '/json/nodes_of_type_'+ req.params.type +'.json');
-    }, 2000);
+      res.end(resultJson);
+    });
 });
 
 app.get('/starwars/links_from_node/:node_id', function(req, res) {
-    api.links_from_node(req.params.node_id);
-    setTimeout(function(){
+    api.links_from_node(req.params.node_id).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile(__dirname + '/json/links_from_node_'+ req.params.node_id +  '.json');
-    }, 2000);
+      res.end(resultJson);
+    });
 });
 
 app.get('/starwars/linked_from_node/:node_id/:relation', function(req, res) {
-    api.linked_from_node(req.params.node_id, req.params.relation);
-    setTimeout(function(){
+    api.linked_from_node(req.params.node_id, req.params.relation).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
-      res.sendFile(__dirname + '/json/linked_from_node_'+req.params.node_id +'_'+ req.params.relation + '.json');
-    }, 2000);
+      res.end(resultJson);
+    });
 });
 
 
 
+
+
+
+
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/Index.html');
+});
 
 
 io.on('connection', function(socket){
