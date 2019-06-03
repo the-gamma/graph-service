@@ -4,28 +4,28 @@ var io = require('socket.io')(http);
 var api = require('./neo4j');
 
 
-app.get('/starwars', function(req, res) {
+app.get('/drWho', function(req, res) {
     api.All_nodes().then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
 });
 
-app.get('/starwars/nodes_of_type/:type', function(req, res) {
+app.get('/drWho/nodes_of_type/:type', function(req, res) {
     api.nodes_of_type(req.params.type).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
 });
 
-app.get('/starwars/links_from_node/:node_id', function(req, res) {
+app.get('/drWho/links_from_node/:node_id', function(req, res) {
     api.links_from_node(req.params.node_id).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
 });
 
-app.get('/starwars/linked_from_node/:node_id/:relation', function(req, res) {
+app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
     api.linked_from_node(req.params.node_id, req.params.relation).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);

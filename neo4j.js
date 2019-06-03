@@ -12,10 +12,12 @@ function add_label(){
 }
 
 
-function All_nodes(){
 
+
+function All_nodes(){
+//--list all types of nodes
   const resultPromise = session.run(
-    'MATCH (n) RETURN n LIMIT 25',
+    'MATCH (n) RETURN n',
   );
 
   return resultPromise.then(result => {
@@ -50,27 +52,23 @@ function All_nodes(){
 
 
 function nodes_of_type(label_type){
+//--list all nodes of type
   add_label();
   const resultPromise = session.run(
-    'MATCH (n) WHERE n.label = $label RETURN n LIMIT 25',
+    'MATCH (n) WHERE n.label = $label RETURN n',
     {label: label_type}
   );
   return resultPromise.then(result => {
     session.close();
-    var jsonString = "";
-    for (var i = 0; i < result.records.length; i++) {
-      const singleRecord = result.records[i];
-      const node = singleRecord.get(0);
-      const node_obj = {
+    const jsonArray = result.records.map(record => {
+      const node = record.get(0);
+      return {
         id: node.identity,
         name: node.labels[0],
         properties: node.properties,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
-      }
-
-      jsonString += JSON.stringify(node_obj) +";";
-    }
-    jsonString = "["+ jsonString.slice(0, jsonString.length-1) + "]";
+      } });
+    const jsonString = JSON.stringify(jsonArray);
     return jsonString;
   }).catch(
        (reason) => {
@@ -81,6 +79,7 @@ function nodes_of_type(label_type){
 
 
 function links_from_node(node_id){
+  //--list all relations linking node with with something
   add_label();
   const resultPromise = session.run(
     'MATCH (a {name: $label})-[r]-(b) RETURN type(r)',
@@ -117,6 +116,7 @@ function links_from_node(node_id){
 
 
 function linked_from_node(name, link){
+  //--list all nodes connected to by relation
   add_label();
   const resultPromise = session.run(
     'MATCH (a)-[r]-(b) WHERE type(r) = $link and a.name = $name RETURN b',
@@ -124,20 +124,15 @@ function linked_from_node(name, link){
   );
   return resultPromise.then(result => {
     session.close();
-    var jsonString = "";
-    for (var i = 0; i < result.records.length; i++) {
-      const singleRecord = result.records[i];
-      const node = singleRecord.get(0);
-      const node_obj = {
+    const jsonArray = result.records.map(record => {
+      const node = record.get(0);
+      return {
         id: node.identity,
         name: node.labels[0],
         properties: node.properties,
-        returns:{"kind":"nested","endpoint":"/links_from_node/"+name},
-      }
-
-      jsonString += JSON.stringify(node_obj) + ",";
-    }
-    jsonString = "["+ jsonString.slice(0, jsonString.length-1) + "]";
+        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+      } });
+    const jsonString = JSON.stringify(jsonArray);
     return jsonString;
   }).catch(
        (reason) => {
