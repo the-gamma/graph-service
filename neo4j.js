@@ -63,7 +63,7 @@ function nodes_of_type(label_type){
     const jsonArray = result.records.map(record => {
       const node = record.get(0);
       return {
-        id: node.identity,
+        id: node.identity.toNumber(),
         name: node.labels[0],
         properties: node.properties,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
@@ -127,7 +127,7 @@ function linked_from_node(name, link){
     const jsonArray = result.records.map(record => {
       const node = record.get(0);
       return {
-        id: node.identity,
+        id: node.identity.toNumber(),
         name: node.labels[0],
         properties: node.properties,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
