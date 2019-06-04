@@ -3,6 +3,11 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var api = require('./neo4j');
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.get('/drWho', function(req, res) {
     api.All_nodes().then(resultJson => {
@@ -31,7 +36,12 @@ app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
       res.end(resultJson);
     });
 });
-
+app.get('/drWho/get_properties_of_node/:node_id', function(req, res) {
+    api.get_properties(req.params.node_id).then(resultJson => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.end(resultJson);
+    });
+});
 
 
 

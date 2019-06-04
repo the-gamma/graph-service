@@ -23,7 +23,7 @@ function All_nodes(){
   return resultPromise.then(result => {
     session.close();
     var jsonString = ""
-    for (var i = 0; i < result.records.length; i++) {
+    for (var i = 0; i < result.records.length ; i++) {
       const singleRecord = result.records[i];
       const node = singleRecord.get(0);
       const node_obj = {
@@ -38,7 +38,7 @@ function All_nodes(){
     arr = arr.split(";");
     let unique = [...new Set(arr)];
     var nl = ""
-    for (var i = 0; i < unique.length; i++) {
+    for (var i = 1; i < unique.length - 1; i++) {
       nl += unique[i] + ",";
     }
     jsonString = "[" + nl.slice(0, nl.length-1) + "]";
@@ -64,7 +64,7 @@ function nodes_of_type(label_type){
       const node = record.get(0);
       return {
         id: node.identity.toNumber(),
-        name: node.labels[0],
+        name: node.properties.name,
         properties: node.properties,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
       } });
@@ -82,12 +82,35 @@ function links_from_node(node_id){
   //--list all relations linking node with with something
   add_label();
   const resultPromise = session.run(
-    'MATCH (a {name: $label})-[r]-(b) RETURN type(r)',
+    'MATCH (a {name: $label})-[r]-(b) RETURN type(r), properties(a)',
     {label: node_id}
   );
   return resultPromise.then(result => {
     session.close();
+    var propertie_string = [];
+    for (var i = 0; i < Object.keys(result.records[0].get(1)).length; i++) {
+      obj = {
+        name: Object.keys(result.records[0].get(1))[i],
+        type: typeof(Object.values(result.records[0].get(1))[i]),
+      }
+      propertie_string.push(obj);
+    }
+    
     var jsonString = "";
+    console.log(typeof(propertie_string));
+    const prop_obj = {
+      name: "get_properties",
+      returns:{
+        kind:"primitive",
+        type: {name:"seq", params:[
+          { name:"record",
+            fields: propertie_string
+            } ]},
+        endpoint:"/get_properties_of_node/"+node_id}
+    }
+    jsonString += JSON.stringify(prop_obj) + ";";
+
+
     for (var i = 0; i < result.records.length; i++) {
       const singleRecord = result.records[i];
       const node = singleRecord.get(0);
@@ -95,9 +118,10 @@ function links_from_node(node_id){
         name: node,
         returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
       }
-
       jsonString += JSON.stringify(node_obj) + ";";
     }
+
+
     var arr =  jsonString.slice(0, jsonString.length-1);
     arr = arr.split(";");
     let unique = [...new Set(arr)];
@@ -142,10 +166,24 @@ function linked_from_node(name, link){
 
 
 
+function get_properties(node_id){
+  const resultPromise = session.run(
+    'MATCH (a) WHERE a.name = $node_id  RETURN a',
+    {node_id: node_id}
+  );
+  return resultPromise.then(result => {
+    session.close();
+    return "[" + JSON.stringify(result.records[0].get(0).properties) + "]";
+  });
+
+}
 
 
 
 
+
+
+exports.get_properties = get_properties;
 exports.All_nodes = All_nodes;
 exports.nodes_of_type = nodes_of_type;
 exports.links_from_node = links_from_node;
