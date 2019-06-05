@@ -1,6 +1,6 @@
 var app = require('express')();
 var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+//var io = require('socket.io')(http);
 var api = require('./neo4j');
 
 app.use(function(req, res, next) {
@@ -54,6 +54,7 @@ app.get('/', function(req, res){
 });
 
 
+/*
 io.on('connection', function(socket){
   console.log('a user connected');
 
@@ -82,7 +83,7 @@ io.on('connection', function(socket){
     console.log('user disconnected');
   });
 });
-
+*/
 
 
 http.listen(8000, function(){
