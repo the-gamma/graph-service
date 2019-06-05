@@ -37,7 +37,7 @@ app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
     });
 });
 
-app.get('/drWho/get_properties_of_node/:node_id', function(req, res) {
+app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
     api.get_properties(req.params.node_id).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);

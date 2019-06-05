@@ -28,6 +28,7 @@ function All_nodes(){
       const node = singleRecord.get(0);
       const node_obj = {
         name: node.labels[0],
+        trace:[],
         returns:{"kind":"nested","endpoint":"/nodes_of_type/"+node.labels},
 
       }
@@ -65,6 +66,7 @@ function nodes_of_type(label_type){
       return {
         name: node.properties.name,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+        trace:[]
       } });
     const jsonString = JSON.stringify(jsonArray);
     return jsonString;
@@ -98,6 +100,7 @@ function links_from_node(node_id){
     console.log(typeof(propertie_string));
     const prop_obj = {
       name: "get_properties",
+      trace:[],
       returns:{
         kind:"primitive",
         type: {name:"seq", params:[
@@ -115,6 +118,7 @@ function links_from_node(node_id){
         if (node != null) {
           const node_obj = {
             name: node,
+            trace:[],
             returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
           }
           jsonString += JSON.stringify(node_obj) + ";";
@@ -154,6 +158,7 @@ function linked_from_node(name, link){
         id: node.identity.toNumber(),
         name: node.labels[0],
         properties: node.properties,
+        trace:[],
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
       } });
     const jsonString = JSON.stringify(jsonArray);
