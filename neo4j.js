@@ -97,7 +97,6 @@ function links_from_node(node_id){
     }
 
     var jsonString = "";
-    console.log(typeof(propertie_string));
     const prop_obj = {
       name: "get_properties",
       trace:[],
@@ -156,7 +155,7 @@ function linked_from_node(name, link){
       const node = record.get(0);
       return {
         id: node.identity.toNumber(),
-        name: node.labels[0],
+        name: node.properties.name,
         properties: node.properties,
         trace:[],
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
