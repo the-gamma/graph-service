@@ -63,9 +63,7 @@ function nodes_of_type(label_type){
     const jsonArray = result.records.map(record => {
       const node = record.get(0);
       return {
-        id: node.identity.toNumber(),
         name: node.properties.name,
-        properties: node.properties,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
       } });
     const jsonString = JSON.stringify(jsonArray);
@@ -82,7 +80,7 @@ function links_from_node(node_id){
   //--list all relations linking node with with something
   add_label();
   const resultPromise = session.run(
-    'MATCH (a {name: $label})-[r]-(b) RETURN type(r), properties(a)',
+    'MATCH  (a {name: $label}) OPTIONAL MATCH (a {name:$label })-[r]-(b) return type(r), properties(a)',
     {label: node_id}
   );
   return resultPromise.then(result => {
@@ -95,7 +93,7 @@ function links_from_node(node_id){
       }
       propertie_string.push(obj);
     }
-    
+
     var jsonString = "";
     console.log(typeof(propertie_string));
     const prop_obj = {
@@ -106,20 +104,22 @@ function links_from_node(node_id){
           { name:"record",
             fields: propertie_string
             } ]},
-        endpoint:"/get_properties_of_node/"+node_id}
+        endpoint:"/get_properties_of_node/"+node_id }
     }
     jsonString += JSON.stringify(prop_obj) + ";";
 
 
-    for (var i = 0; i < result.records.length; i++) {
-      const singleRecord = result.records[i];
-      const node = singleRecord.get(0);
-      const node_obj = {
-        name: node,
-        returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
+      for (var i = 0; i < result.records.length; i++) {
+        const singleRecord = result.records[i];
+        const node = singleRecord.get(0);
+        if (node != null) {
+          const node_obj = {
+            name: node,
+            returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
+          }
+          jsonString += JSON.stringify(node_obj) + ";";
+        }
       }
-      jsonString += JSON.stringify(node_obj) + ";";
-    }
 
 
     var arr =  jsonString.slice(0, jsonString.length-1);
