@@ -12,8 +12,6 @@ function add_label(){
 }
 
 
-
-
 function All_nodes(){
 //--list all types of nodes
   const resultPromise = session.run(
@@ -82,8 +80,8 @@ function links_from_node(node_id){
   //--list all relations linking node with with something
   add_label();
   const resultPromise = session.run(
-    'MATCH  (a {name: $label}) OPTIONAL MATCH (a {name:$label })-[r]-(b) return type(r), properties(a)',
-    {label: node_id}
+    'MATCH  (a {name: $name}) OPTIONAL MATCH (a {name:$name })-[r]-(b) return type(r), properties(a)',
+    {name: node_id}
   );
   return resultPromise.then(result => {
     session.close();
@@ -177,11 +175,19 @@ function get_properties(node_id){
   );
   return resultPromise.then(result => {
     session.close();
-    return "[" + JSON.stringify(result.records[0].get(0).properties) + "]";
+    var obj = {};
+
+    for (var property in result.records[0].get(0).properties) {
+      if (typeof(result.records[0].get(0).properties[property]) === typeof({})) {
+        obj[property] = result.records[0].get(0).properties[property].toNumber();
+      } else {
+        obj[property] = result.records[0].get(0).properties[property];
+      }
+    }
+    return "[" + JSON.stringify(obj) + "]";
   });
 
 }
-
 
 
 
