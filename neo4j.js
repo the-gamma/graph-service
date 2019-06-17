@@ -87,10 +87,18 @@ function links_from_node(node_id){
     session.close();
     var propertie_string = [];
     for (var i = 0; i < Object.keys(result.records[0].get(1)).length; i++) {
-      obj = {
-        name: Object.keys(result.records[0].get(1))[i],
-        type: typeof(Object.values(result.records[0].get(1))[i]),
+      if (typeof(Object.values(result.records[0].get(1))[i]) === typeof({})) {
+        obj = {
+          name: Object.keys(result.records[0].get(1))[i],
+          type: typeof("4"),
+        }
+      }else {
+        obj = {
+          name: Object.keys(result.records[0].get(1))[i],
+          type: typeof(Object.values(result.records[0].get(1))[i]),
+        }
       }
+
       propertie_string.push(obj);
     }
 
@@ -179,7 +187,7 @@ function get_properties(node_id){
 
     for (var property in result.records[0].get(0).properties) {
       if (typeof(result.records[0].get(0).properties[property]) === typeof({})) {
-        obj[property] = result.records[0].get(0).properties[property].toNumber();
+        obj[property] = result.records[0].get(0).properties[property].toString();
       } else {
         obj[property] = result.records[0].get(0).properties[property];
       }
