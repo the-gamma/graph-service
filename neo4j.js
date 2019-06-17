@@ -90,12 +90,8 @@ function links_from_node(node_id){
       if (typeof(Object.values(result.records[0].get(1))[i]) === typeof({})) {
         obj = {
           name: Object.keys(result.records[0].get(1))[i],
-<<<<<<< HEAD
           type: "float",
-=======
-          type: typeof("4"),
->>>>>>> 0b4fbb37ce8261243630ce22881a805396c21cd7
-        }
+}
       }else {
         obj = {
           name: Object.keys(result.records[0].get(1))[i],
@@ -191,7 +187,7 @@ function get_properties(node_id){
 
     for (var property in result.records[0].get(0).properties) {
       if (typeof(result.records[0].get(0).properties[property]) === typeof({})) {
-        obj[property] = result.records[0].get(0).properties[property].toString();
+        obj[property] = result.records[0].get(0).properties[property].toNumber();
       } else {
         obj[property] = result.records[0].get(0).properties[property];
       }
