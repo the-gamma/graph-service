@@ -37,7 +37,7 @@ function All_nodes(){
     arr = arr.split(";");
     let unique = [...new Set(arr)];
     var nl = ""
-    for (var i = 1; i < unique.length - 1; i++) {
+    for (var i = 1; i < unique.length ; i++) {
       nl += unique[i] + ",";
     }
     jsonString = "[" + nl.slice(0, nl.length-1) + "]";
