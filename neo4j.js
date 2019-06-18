@@ -233,7 +233,7 @@ function linked_any(link){
   );
   return resultPromise.then(result => {
     session.close();
-    const jsonArray = result.records.map(record => {
+    var jsonArray = result.records.map(record => {
       const node = record.get(0);
       return {
         id: node.identity.toNumber(),
@@ -248,7 +248,11 @@ function linked_any(link){
       trace:[]
     };
     jsonArray.push(any);
-    const jsonString = JSON.stringify(jsonArray);
+    var cache = {};
+    jsonArray = jsonArray.filter(function(elem,index,array){
+	     return cache[elem.id]?0:cache[elem.id]=1;
+     });
+    var jsonString = JSON.stringify(jsonArray);
     return jsonString;
   }).catch(
        (reason) => {
@@ -267,7 +271,7 @@ function linked_from_node(name, link){
   );
   return resultPromise.then(result => {
     session.close();
-    const jsonArray = result.records.map(record => {
+    var jsonArray = result.records.map(record => {
       const node = record.get(0);
       return {
         id: node.identity.toNumber(),
@@ -282,6 +286,10 @@ function linked_from_node(name, link){
         trace:[]
       };
     jsonArray.push(any);
+    var cache = {};
+    jsonArray = jsonArray.filter(function(elem,index,array){
+	     return cache[elem.id]?0:cache[elem.id]=1;
+     });
     const jsonString = JSON.stringify(jsonArray);
     return jsonString;
   }).catch(
