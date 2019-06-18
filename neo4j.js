@@ -59,14 +59,21 @@ function nodes_of_type(label_type){
   );
   return resultPromise.then(result => {
     session.close();
-    const jsonArray = result.records.map(record => {
+    var jsonArray = result.records.map(record => {
       const node = record.get(0);
       return {
         name: node.properties.name,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
         trace:[]
       } });
-    const jsonString = JSON.stringify(jsonArray);
+
+    var any = {
+      name: "any",
+      returns:{"kind":"nested","endpoint":"/links_from_any_node/" + label_type},
+      trace:[]
+    };
+    jsonArray.push(any);
+    var jsonString = JSON.stringify(jsonArray);
     return jsonString;
   }).catch(
        (reason) => {
@@ -74,7 +81,76 @@ function nodes_of_type(label_type){
         });
 }
 
+function links_from_any_node(label_type){
+  add_label();
+  const resultPromise = session.run(
+    'MATCH  (a {label: $label}) OPTIONAL MATCH (a {label:$label })-[r]-(b) return type(r), properties(a)',
+    {label: label_type}
+  );
+  return resultPromise.then(result => {
+    session.close();
+    var propertie_string = [];
+    for (var i = 0; i < Object.keys(result.records[0].get(1)).length; i++) {
+      if (typeof(Object.values(result.records[0].get(1))[i]) === typeof({})) {
+        obj = {
+          name: Object.keys(result.records[0].get(1))[i],
+          type: "float",
+}
+      }else {
+        obj = {
+          name: Object.keys(result.records[0].get(1))[i],
+          type: typeof(Object.values(result.records[0].get(1))[i]),
+        }
+      }
 
+      propertie_string.push(obj);
+    }
+
+    var jsonString = "";
+    const prop_obj = {
+      name: "get_properties",
+      trace:[],
+      returns:{
+        kind:"primitive",
+        type: {name:"seq", params:[
+          { name:"record",
+            fields: propertie_string
+            } ]},
+        endpoint:"/get_properties_of_node/"+"any" }
+    }
+    jsonString += JSON.stringify(prop_obj) + ";";
+
+
+      for (var i = 0; i < result.records.length; i++) {
+        const singleRecord = result.records[i];
+        const node = singleRecord.get(0);
+        if (node != null) {
+          const node_obj = {
+            name: node,
+            trace:[],
+            returns:{"kind":"nested","endpoint":"/linked_from_node/"+ "any" + "/"+ node},
+          }
+          jsonString += JSON.stringify(node_obj) + ";";
+        }
+      }
+
+
+    var arr =  jsonString.slice(0, jsonString.length-1);
+    arr = arr.split(";");
+    let unique = [...new Set(arr)];
+    var nl = "";
+    for (var i = 0; i < unique.length; i++) {
+      nl += unique[i] + ",";
+    }
+    jsonString = "[" + nl.slice(0, nl.length-1) + "]";
+    return jsonString;
+  }).catch(
+       (reason) => {
+            console.log('Handle rejected promise ('+reason+') here.');
+        });
+
+
+}
 
 function links_from_node(node_id){
   //--list all relations linking node with with something
@@ -146,13 +222,47 @@ function links_from_node(node_id){
         });
 }
 
+// linked from node marche pas a cause promise
+
+
+function linked_any(link){
+  add_label();
+  const resultPromise = session.run(
+      'MATCH (a)-[r]-(b) WHERE type(r) = $link RETURN b, a.label',
+      {link: link}
+  );
+  return resultPromise.then(result => {
+    session.close();
+    const jsonArray = result.records.map(record => {
+      const node = record.get(0);
+      return {
+        id: node.identity.toNumber(),
+        name: node.properties.name,
+        properties: node.properties,
+        trace:[],
+        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+    } });
+    var any = {
+      name: "any",
+      returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
+      trace:[]
+    };
+    jsonArray.push(any);
+    const jsonString = JSON.stringify(jsonArray);
+    return jsonString;
+  }).catch(
+       (reason) => {
+            console.log('Handle rejected promise ('+reason+') here.');
+        });
+}
+
 
 
 function linked_from_node(name, link){
   //--list all nodes connected to by relation
   add_label();
   const resultPromise = session.run(
-    'MATCH (a)-[r]-(b) WHERE type(r) = $link and a.name = $name RETURN b',
+    'MATCH (a)-[r]-(b) WHERE type(r) = $link and a.name = $name RETURN b, a.label',
     {name: name, link: link}
   );
   return resultPromise.then(result => {
@@ -166,6 +276,12 @@ function linked_from_node(name, link){
         trace:[],
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
       } });
+      var any = {
+        name: "any",
+        returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
+        trace:[]
+      };
+    jsonArray.push(any);
     const jsonString = JSON.stringify(jsonArray);
     return jsonString;
   }).catch(
@@ -199,8 +315,8 @@ function get_properties(node_id){
 
 
 
-
-
+exports.linked_any = linked_any;
+exports.links_from_any_node = links_from_any_node;
 exports.get_properties = get_properties;
 exports.All_nodes = All_nodes;
 exports.nodes_of_type = nodes_of_type;

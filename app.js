@@ -30,11 +30,25 @@ app.get('/drWho/links_from_node/:node_id', function(req, res) {
     });
 });
 
+app.get('/drWho/links_from_any_node/:label_type', function(req, res) {
+    api.links_from_any_node(req.params.label_type).then(resultJson => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.end(resultJson);
+    });
+});
+
 app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
+  if (req.params.node_id == 'any') {
+    api.linked_any(req.params.relation).then(resultJson => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.end(resultJson);
+    });
+  }else {
     api.linked_from_node(req.params.node_id, req.params.relation).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
+  }
 });
 
 app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
