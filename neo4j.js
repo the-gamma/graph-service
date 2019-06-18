@@ -26,7 +26,7 @@ function All_nodes(){
       const node = singleRecord.get(0);
       const node_obj = {
         name: node.labels[0],
-        trace:[],
+        trace:["345"],
         returns:{"kind":"nested","endpoint":"/nodes_of_type/"+node.labels},
 
       }
@@ -64,13 +64,13 @@ function nodes_of_type(label_type){
       return {
         name: node.properties.name,
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
-        trace:[]
+        trace:["abc"]
       } });
 
     var any = {
       name: "any",
       returns:{"kind":"nested","endpoint":"/links_from_any_node/" + label_type},
-      trace:[]
+      trace:["def"]
     };
     jsonArray.push(any);
     var jsonString = JSON.stringify(jsonArray);
@@ -109,7 +109,7 @@ function links_from_any_node(label_type){
     var jsonString = "";
     const prop_obj = {
       name: "get_properties",
-      trace:[],
+      trace:["geh"],
       returns:{
         kind:"primitive",
         type: {name:"seq", params:[
@@ -127,7 +127,7 @@ function links_from_any_node(label_type){
         if (node != null) {
           const node_obj = {
             name: node,
-            trace:[],
+            trace:["ijk"],
             returns:{"kind":"nested","endpoint":"/linked_from_node/"+ "any" + "/"+ node},
           }
           jsonString += JSON.stringify(node_obj) + ";";
@@ -181,7 +181,7 @@ function links_from_node(node_id){
     var jsonString = "";
     const prop_obj = {
       name: "get_properties",
-      trace:[],
+      trace:["lmn"],
       returns:{
         kind:"primitive",
         type: {name:"seq", params:[
@@ -199,7 +199,7 @@ function links_from_node(node_id){
         if (node != null) {
           const node_obj = {
             name: node,
-            trace:[],
+            trace:["opq"],
             returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
           }
           jsonString += JSON.stringify(node_obj) + ";";
@@ -239,13 +239,13 @@ function linked_any(link){
         id: node.identity.toNumber(),
         name: node.properties.name,
         properties: node.properties,
-        trace:[],
+        trace:["rst"],
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
     } });
     var any = {
       name: "any",
       returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
-      trace:[]
+      trace:["uvw"]
     };
     jsonArray.push(any);
     var cache = {};
@@ -277,13 +277,13 @@ function linked_from_node(name, link){
         id: node.identity.toNumber(),
         name: node.properties.name,
         properties: node.properties,
-        trace:[],
+        trace:["xyz"],
         returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
       } });
       var any = {
         name: "any",
         returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
-        trace:[]
+        trace:["012"]
       };
     jsonArray.push(any);
     var cache = {};

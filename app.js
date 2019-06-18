@@ -52,16 +52,17 @@ app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
 });
 
 app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
+  var data = "";
+  req.setEncoding('utf8');
+  req.on("data", function(chunk) { data += chunk });
+  req.on('end', function() {
+    console.log(data)
     api.get_properties(req.params.node_id).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
+  });
 });
-
-
-
-
-
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/Index.html');
