@@ -51,13 +51,24 @@ app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
   }
 });
 
+//app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
+//    api.get_properties(req.params.node_id).then(resultJson => {
+//      res.setHeader('Content-Type', 'text/plain');
+//      res.end(resultJson);
+//    });
+//});
 app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
+  var data = "";
+  req.setEncoding('utf8');
+  req.on("data", function(chunk) { data += chunk });
+  req.on('end', function() {
+    console.log(data)
     api.get_properties(req.params.node_id).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
+  });
 });
-
 
 
 
@@ -67,37 +78,6 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/Index.html');
 });
 
-
-/*
-io.on('connection', function(socket){
-  console.log('a user connected');
-
-  socket.on('chat message', function(msg){
-
-    if (msg == "All_nodes" ) {
-      api.All_nodes();
-    }
-    else if (msg == "nodes_of_type" ) {
-      api.nodes_of_type("hero");
-    }
-    else if (msg == "links_from_node" ) {
-      api.links_from_node("Luke");
-    }
-    else if (msg == "linked_from_node" ) {
-      api.linked_from_node("Luke","TEACH");
-    }
-    else{
-      console.log("this query doesn't exist");
-      io.emit('response', "this query doesn't exist");
-    }
-
-  });
-
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
-});
-*/
 
 
 http.listen(8000, function(){
