@@ -1,14 +1,62 @@
 const neo4j = require('neo4j-driver').v1;
-var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "azerty"));
+var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "garfield"));
 const session = driver.session();
 const fs = require('fs')
+
+function constructDataQuery(traceString) {
+  const trace = traceString.split('&')
+  var conditions = "n1.label = $label";
+  var returns = "n1";
+  var query = "(n1)";
+  var args = 
+    { label:trace[0],
+    }
+
+  var numNodes = trace.length/2;
+  for(var n = 1; n <= numNodes; n++)
+  {
+    var nodeName = trace[(n-1)*2+1];
+    if (n > 1) 
+    {
+      returns += ", n" + n;
+      query += "-[r" + (n-1) + "]->"
+      query += "(n" + n + ")";
+
+      conditions += " AND type(r" + (n-1) + ") = $r" + (n-1) + "type"
+      args["r" + (n-1) + "type"] = trace[(n-1)*2];
+      
+    }
+    if (nodeName != "[any]") {
+      conditions += " AND n" + n + ".name = $n" + n + "name"
+      args["n" + n + "name"] = nodeName;
+    }
+  }
+  return ['MATCH ' + query + ' WHERE ' + conditions + ' RETURN ' + returns, args];
+}
+
+//var [query, args] = constructDataQuery("Character&Doctor&ENEMY_OF&[any]&APPEARED_IN&[any]")
+var [query, args] = constructDataQuery("Actor&[any]")
+const resultPromise = session.run(query, args);
+resultPromise.then(result => {
+  session.close();
+
+  for(var res of result.records) {
+    console.log("============");
+    for(var i = 0; i < res._fields.length; i++) {
+      for(var prop of Object.keys(res._fields[i].properties)) {
+        console.log(" - node" + (i+1) + "." + prop + " = " + res._fields[i].properties[prop] + ", " + typeof(res._fields[i].properties[prop]))
+      }
+    }
+  }
+
+  fs.writeFile("test.json", JSON.stringify(result), function(err) { })
+});
 
 
 function add_label(){
   const resultPromise = session.run(
     'MATCH (n)  SET n.label = labels(n)[0]' ,
   );
-
 }
 
 
@@ -300,7 +348,15 @@ function linked_from_node(name, link){
 
 
 
-function get_properties(node_id){
+function get_properties(traceString, node_id){
+  /*var [query, args] = constructDataQuery("Character&Doctor&ENEMY_OF&[any]&APPEARED_IN&[any]")
+  const resultPromise = session.run(query, args);
+  resultPromise.then(result => {
+    session.close();
+    fs.writeFile("test.json", JSON.stringify(result), function(err) { })
+  });
+  */
+
   const resultPromise = session.run(
     'MATCH (a) WHERE a.name = $node_id  RETURN a',
     {node_id: node_id}
