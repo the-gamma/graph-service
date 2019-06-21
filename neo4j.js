@@ -178,7 +178,7 @@ function links_from_any_node(label_type, traceString){
             { name:"record",
               fields: propertie_string
               } ]},
-          endpoint:"/get_properties_of_node/"+"any" }
+          endpoint:"/get_properties_of_node" }
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
@@ -245,7 +245,7 @@ function links_from_node(node_id, traceString){
             { name:"record",
               fields: propertie_string
               } ]},
-          endpoint:"/get_properties_of_node/"+node_id }
+          endpoint:"/get_properties_of_node" }
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
@@ -360,17 +360,13 @@ function linked_from_node(name, link){
 
 
 
-function get_properties(traceString, node_id){
-/*
-  We need to get the list of key, then generate the json with it
-*/
+function get_properties(traceString){
   return list_of_key_and_type(traceString).then(res => {
     const key = res[0];
     var [query, args] = constructDataQuery(traceString);
     const resultPromise = session.run(query, args);
     return resultPromise.then(result => {
       session.close();
-      fs.writeFile("test.json", JSON.stringify(result), function(err) { })
       var jsonArray = result.records.map(record => {
       var obj = {};
       for (var n in key) {
