@@ -1,5 +1,5 @@
 const neo4j = require('neo4j-driver').v1;
-var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "azerty"));
+var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "garfield"));
 const session = driver.session();
 const fs = require('fs')
 
@@ -35,8 +35,12 @@ function constructDataQuery(traceString) {
 }
 
 //var [query, args] = constructDataQuery("Character&Doctor&ENEMY_OF&[any]&APPEARED_IN&[any]")
-
-
+function makeNestedType(url, trace, append) {
+  var url = 
+    append ? ("/" + encodeURIComponent(trace + "&" + append) + url) : 
+             ("/" + encodeURIComponent(trace) + url);
+  return {"kind":"nested","endpoint":url}
+}
 
 function list_of_key_and_type(traceString){
   var [query, args] = constructDataQuery(traceString)
@@ -93,9 +97,8 @@ function All_nodes(){
       const node = singleRecord.get(0);
       const node_obj = {
         name: node.labels[0],
-        trace:[node.labels[0]],
-        returns:{"kind":"nested","endpoint":"/nodes_of_type/"+node.labels},
-
+        trace:[],
+        returns:makeNestedType("/nodes_of_type/"+node.labels, node.labels[0])
       }
       jsonString += JSON.stringify(node_obj) + ";";
 
@@ -117,7 +120,7 @@ function All_nodes(){
 
 
 
-function nodes_of_type(label_type){
+function nodes_of_type(traceString, label_type){
 //--list all nodes of type
   add_label();
   const resultPromise = session.run(
@@ -130,14 +133,14 @@ function nodes_of_type(label_type){
       const node = record.get(0);
       return {
         name: node.properties.name,
-        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
-        trace:[node.properties.name]
+        trace:[],
+        returns:makeNestedType("/links_from_node/"+node.properties.name, traceString, node.properties.name)
       } });
 
     var any = {
       name: "[any]",
-      returns:{"kind":"nested","endpoint":"/links_from_any_node/" + label_type},
-      trace:["[any]"]
+      trace:[], 
+      returns:makeNestedType("/links_from_any_node/"+label_type, traceString, "[any]")
     };
     jsonArray.push(any);
     var jsonString = JSON.stringify(jsonArray);
@@ -148,7 +151,7 @@ function nodes_of_type(label_type){
         });
 }
 
-function links_from_any_node(label_type, traceString){
+function links_from_any_node(traceString, label_type){
   add_label();
   return list_of_key_and_type(traceString).then(res => {
     const key = res[0];
@@ -178,7 +181,7 @@ function links_from_any_node(label_type, traceString){
             { name:"record",
               fields: propertie_string
               } ]},
-          endpoint:"/get_properties_of_node/"+"any" }
+          endpoint:"/" + encodeURIComponent(traceString) + "/get_properties_of_node/any" }
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
@@ -189,8 +192,8 @@ function links_from_any_node(label_type, traceString){
           if (node != null) {
             const node_obj = {
               name: node,
-              trace:[node],
-              returns:{"kind":"nested","endpoint":"/linked_from_node/"+ "any" + "/"+ node},
+              trace:[],
+              returns:makeNestedType("/linked_from_node/"+ "any" + "/"+ node, traceString, node)
             }
             jsonString += JSON.stringify(node_obj) + ";";
           }
@@ -214,7 +217,7 @@ function links_from_any_node(label_type, traceString){
   });
 }
 
-function links_from_node(node_id, traceString){
+function links_from_node(traceString, node_id){
   //--list all relations linking node with with something
   add_label();
   return list_of_key_and_type(traceString).then(res => {
@@ -245,7 +248,7 @@ function links_from_node(node_id, traceString){
             { name:"record",
               fields: propertie_string
               } ]},
-          endpoint:"/get_properties_of_node/"+node_id }
+          endpoint:"/" + encodeURIComponent(traceString) + "/get_properties_of_node/"+node_id }
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
@@ -256,8 +259,8 @@ function links_from_node(node_id, traceString){
           if (node != null) {
             const node_obj = {
               name: node,
-              trace:[node],
-              returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
+              trace:[],
+              returns:makeNestedType("/linked_from_node/"+ node_id + "/"+ node, traceString, node)
             }
             jsonString += JSON.stringify(node_obj) + ";";
           }
@@ -285,7 +288,7 @@ function links_from_node(node_id, traceString){
 // linked from node marche pas a cause promise
 
 
-function linked_any(link){
+function linked_any(traceString, link){
   add_label();
   const resultPromise = session.run(
       'MATCH (a)-[r]-(b) WHERE type(r) = $link RETURN b, a.label',
@@ -299,13 +302,14 @@ function linked_any(link){
         id: node.identity.toNumber(),
         name: node.properties.name,
         properties: node.properties,
-        trace:[node.properties.name],
-        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+        trace:[],
+        returns:makeNestedType("/links_from_node/"+ node.properties.name, traceString, node.properties.name)
+
     } });
     var any = {
       name: "[any]",
-      returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
-      trace:["[any]"]
+      trace:[""],
+      returns:makeNestedType("/links_from_any_node/"+ result.records[0].get(1), traceString, "[any]")
     };
     jsonArray.push(any);
     var cache = {};
@@ -322,7 +326,7 @@ function linked_any(link){
 
 
 
-function linked_from_node(name, link){
+function linked_from_node(traceString, name, link){
   //--list all nodes connected to by relation
   add_label();
   const resultPromise = session.run(
@@ -337,13 +341,14 @@ function linked_from_node(name, link){
         id: node.identity.toNumber(),
         name: node.properties.name,
         properties: node.properties,
-        trace:[node.properties.name],
-        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+        trace:[],
+        returns:makeNestedType("/links_from_node/"+node.properties.name, traceString, node.properties.name)
+  
       } });
       var any = {
         name: "[any]",
-        returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
-        trace:["[any]"]
+        trace:[],
+        returns:makeNestedType("/links_from_any_node/"+result.records[0].get(1), traceString, "[any]")
       };
     jsonArray.push(any);
     var cache = {};

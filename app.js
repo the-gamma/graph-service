@@ -16,45 +16,35 @@ app.get('/drWho', function(req, res) {
     });
 });
 
-app.get('/drWho/nodes_of_type/:type', function(req, res) {
-    api.nodes_of_type(req.params.type).then(resultJson => {
+app.get('/drWho/:trace/nodes_of_type/:type', function(req, res) {
+    api.nodes_of_type(decodeURIComponent(req.params.trace), req.params.type).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
 });
 
-app.get('/drWho/links_from_node/:node_id', function(req, res) {
-  var trace = "";
-  req.setEncoding('utf8');
-  req.on("data", function(chunk) { trace += chunk });
-  req.on('end', function() {
-    api.links_from_node(req.params.node_id, trace).then(resultJson => {
-      res.setHeader('Content-Type', 'text/plain');
-      res.end(resultJson);
-    });
+app.get('/drWho/:trace/links_from_node/:node_id', function(req, res) {
+  api.links_from_node(decodeURIComponent(req.params.trace), req.params.node_id).then(resultJson => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(resultJson);
   });
 });
 
-app.get('/drWho/links_from_any_node/:label_type', function(req, res) {
-    var trace = "";
-    req.setEncoding('utf8');
-    req.on("data", function(chunk) { trace += chunk });
-    req.on('end', function() {
-      api.links_from_any_node(req.params.label_type, trace).then(resultJson => {
-        res.setHeader('Content-Type', 'text/plain');
-        res.end(resultJson);
-      });
+app.get('/drWho/:trace/links_from_any_node/:label_type', function(req, res) {
+    api.links_from_any_node(decodeURIComponent(req.params.trace), req.params.label_type).then(resultJson => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.end(resultJson);
     });
 });
 
-app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
+app.get('/drWho/:trace/linked_from_node/:node_id/:relation', function(req, res) {
   if (req.params.node_id == 'any') {
-    api.linked_any(req.params.relation).then(resultJson => {
+    api.linked_any(decodeURIComponent(req.params.trace), req.params.relation).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
   }else {
-    api.linked_from_node(req.params.node_id, req.params.relation).then(resultJson => {
+    api.linked_from_node(decodeURIComponent(req.params.trace), req.params.node_id, req.params.relation).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
@@ -67,15 +57,10 @@ app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
 //      res.end(resultJson);
 //    });
 //});
-app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
-  var trace = "";
-  req.setEncoding('utf8');
-  req.on("data", function(chunk) { trace += chunk });
-  req.on('end', function() {
-    api.get_properties(trace, req.params.node_id).then(resultJson => {
-      res.setHeader('Content-Type', 'text/plain');
-      res.end(resultJson);
-    });
+app.all('/drWho/:trace/get_properties_of_node/:node_id', function(req, res) {
+  api.get_properties(decodeURIComponent(req.params.trace), req.params.node_id).then(resultJson => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(resultJson);
   });
 });
 
