@@ -361,31 +361,41 @@ function linked_from_node(name, link){
 
 
 function get_properties(traceString, node_id){
-  /*var [query, args] = constructDataQuery("Character&Doctor&ENEMY_OF&[any]&APPEARED_IN&[any]")
-  const resultPromise = session.run(query, args);
-  resultPromise.then(result => {
-    session.close();
-    fs.writeFile("test.json", JSON.stringify(result), function(err) { })
-  });
-  */
+/*
+  We need to get the list of key, then generate the json with it
+*/
+  return list_of_key_and_type(traceString).then(res => {
+    const key = res[0];
+    var [query, args] = constructDataQuery(traceString);
+    const resultPromise = session.run(query, args);
+    return resultPromise.then(result => {
+      session.close();
+      fs.writeFile("test.json", JSON.stringify(result), function(err) { })
+      var jsonArray = result.records.map(record => {
+      var obj = {};
+      for (var n in key) {
+        var prop_name_list = Object.keys(record._fields[0].properties);
+        var arr = key;
+        for(var i = 0, len = arr.length; i < len; i++) {
+          arr[i] = arr[i].replace(record.keys[0].replace(/n/g, "node") + ".", '');
+        }
+        if (prop_name_list.includes(arr[n])) {
+          if (typeof(record._fields[0].properties[arr[n]]) == typeof({})) {
+            obj[key[n]] = record._fields[0].properties[arr[n]].toNumber();
+          } else {
+            obj[key[n]] = record._fields[0].properties[arr[n]];
+          }
 
-  const resultPromise = session.run(
-    'MATCH (a) WHERE a.name = $node_id  RETURN a',
-    {node_id: node_id}
-  );
-  return resultPromise.then(result => {
-    session.close();
-    var obj = {};
-
-    for (var property in result.records[0].get(0).properties) {
-      if (typeof(result.records[0].get(0).properties[property]) === typeof({})) {
-        obj[property] = result.records[0].get(0).properties[property].toNumber();
-      } else {
-        obj[property] = result.records[0].get(0).properties[property];
+        } else {
+          obj[key[n]] = 0 ;
+        }
       }
-    }
-    return "[" + JSON.stringify(obj) + "]";
+      return obj;
+    });
+      return JSON.stringify(jsonArray);
+
   });
+});
 
 }
 

@@ -24,27 +24,19 @@ app.get('/drWho/nodes_of_type/:type', function(req, res) {
 });
 
 app.get('/drWho/links_from_node/:node_id', function(req, res) {
-  var trace = "";
-  req.setEncoding('utf8');
-  req.on("data", function(chunk) { trace += chunk });
-  req.on('end', function() {
-    api.links_from_node(req.params.node_id, trace).then(resultJson => {
-      res.setHeader('Content-Type', 'text/plain');
-      res.end(resultJson);
-    });
+  api.links_from_node(req.params.node_id, trace).then(resultJson => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(resultJson);
   });
 });
 
 app.get('/drWho/links_from_any_node/:label_type', function(req, res) {
-    var trace = "";
-    req.setEncoding('utf8');
-    req.on("data", function(chunk) { trace += chunk });
-    req.on('end', function() {
-      api.links_from_any_node(req.params.label_type, trace).then(resultJson => {
-        res.setHeader('Content-Type', 'text/plain');
-        res.end(resultJson);
-      });
+    trace = 'Actor&[any]'
+    api.links_from_any_node(req.params.label_type, trace).then(resultJson => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.end(resultJson);
     });
+
 });
 
 app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
