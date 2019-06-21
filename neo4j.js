@@ -55,8 +55,6 @@ function list_of_key_and_type(traceString){
         }
       }
     }
-
-    fs.writeFile("test.json", JSON.stringify(result), function(err) { })
     type.forEach(function(item, i) { if (item == "object") type[i] = "float"; });
     let unique_key = [...new Set(key)];
     var unique_type = []
@@ -68,8 +66,6 @@ function list_of_key_and_type(traceString){
 
 
 }
-
-
 
 
 function add_label(){
@@ -94,7 +90,7 @@ function All_nodes(){
       const node_obj = {
         name: node.labels[0],
         trace:[node.labels[0]],
-        returns:{"kind":"nested","endpoint":"/nodes_of_type/"+node.labels},
+        returns:{"kind":"nested","endpoint": "/" + node.labels[0] + "/nodes_of_type/"+node.labels},
 
       }
       jsonString += JSON.stringify(node_obj) + ";";
@@ -117,7 +113,7 @@ function All_nodes(){
 
 
 
-function nodes_of_type(label_type){
+function nodes_of_type(label_type, trace){
 //--list all nodes of type
   add_label();
   const resultPromise = session.run(
@@ -130,13 +126,13 @@ function nodes_of_type(label_type){
       const node = record.get(0);
       return {
         name: node.properties.name,
-        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+        returns:{"kind":"nested","endpoint":trace +"&" + node.properties.name + "/links_from_node/"+node.properties.name},
         trace:[node.properties.name]
       } });
 
     var any = {
       name: "[any]",
-      returns:{"kind":"nested","endpoint":"/links_from_any_node/" + label_type},
+      returns:{"kind":"nested","endpoint":trace + "&[any]" +"/links_from_any_node/" + label_type},
       trace:["[any]"]
     };
     jsonArray.push(any);
@@ -190,7 +186,7 @@ function links_from_any_node(label_type, traceString){
             const node_obj = {
               name: node,
               trace:[node],
-              returns:{"kind":"nested","endpoint":"/linked_from_node/"+ "any" + "/"+ node},
+              returns:{"kind":"nested","endpoint":traceString + "&" + node + "/linked_from_node/"+ "any" + "/"+ node},
             }
             jsonString += JSON.stringify(node_obj) + ";";
           }
@@ -257,7 +253,7 @@ function links_from_node(node_id, traceString){
             const node_obj = {
               name: node,
               trace:[node],
-              returns:{"kind":"nested","endpoint":"/linked_from_node/"+ node_id + "/"+ node},
+              returns:{"kind":"nested","endpoint":traceString + "&" + node +"/linked_from_node/"+ node_id + "/"+ node},
             }
             jsonString += JSON.stringify(node_obj) + ";";
           }
@@ -285,7 +281,7 @@ function links_from_node(node_id, traceString){
 // linked from node marche pas a cause promise
 
 
-function linked_any(link){
+function linked_any(link, trace){
   add_label();
   const resultPromise = session.run(
       'MATCH (a)-[r]-(b) WHERE type(r) = $link RETURN b, a.label',
@@ -300,11 +296,11 @@ function linked_any(link){
         name: node.properties.name,
         properties: node.properties,
         trace:[node.properties.name],
-        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+        returns:{"kind":"nested","endpoint":trace + "&"+ node.properties.name + "/links_from_node/"+node.properties.name},
     } });
     var any = {
       name: "[any]",
-      returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
+      returns:{"kind":"nested","endpoint":trace + "&"+ "[any]" + "/links_from_any_node/" + result.records[0].get(1)},
       trace:["[any]"]
     };
     jsonArray.push(any);
@@ -322,7 +318,7 @@ function linked_any(link){
 
 
 
-function linked_from_node(name, link){
+function linked_from_node(name, link, trace){
   //--list all nodes connected to by relation
   add_label();
   const resultPromise = session.run(
@@ -338,11 +334,11 @@ function linked_from_node(name, link){
         name: node.properties.name,
         properties: node.properties,
         trace:[node.properties.name],
-        returns:{"kind":"nested","endpoint":"/links_from_node/"+node.properties.name},
+        returns:{"kind":"nested","endpoint":trace + "&" + node.properties.name + "/links_from_node/"+node.properties.name},
       } });
       var any = {
         name: "[any]",
-        returns:{"kind":"nested","endpoint":"/links_from_any_node/" + result.records[0].get(1)},
+        returns:{"kind":"nested","endpoint":trace + "&" + "[any]" +"/links_from_any_node/" + result.records[0].get(1)},
         trace:["[any]"]
       };
     jsonArray.push(any);

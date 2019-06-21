@@ -16,37 +16,36 @@ app.get('/drWho', function(req, res) {
     });
 });
 
-app.get('/drWho/nodes_of_type/:type', function(req, res) {
-    api.nodes_of_type(req.params.type).then(resultJson => {
+app.get('/drWho/:trace/nodes_of_type/:type', function(req, res) {
+    api.nodes_of_type(req.params.type, req.params.trace).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
 });
 
-app.get('/drWho/links_from_node/:node_id', function(req, res) {
-  api.links_from_node(req.params.node_id, trace).then(resultJson => {
+app.get('/drWho/:trace/links_from_node/:node_id', function(req, res) {
+  api.links_from_node(req.params.node_id,  req.params.trace).then(resultJson => {
     res.setHeader('Content-Type', 'text/plain');
     res.end(resultJson);
   });
 });
 
-app.get('/drWho/links_from_any_node/:label_type', function(req, res) {
-    trace = 'Actor&[any]'
-    api.links_from_any_node(req.params.label_type, trace).then(resultJson => {
+app.get('/drWho/:trace/links_from_any_node/:label_type', function(req, res) {
+    api.links_from_any_node(req.params.label_type, req.params.trace).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
 
 });
 
-app.get('/drWho/linked_from_node/:node_id/:relation', function(req, res) {
+app.get('/drWho/:trace/linked_from_node/:node_id/:relation', function(req, res) {
   if (req.params.node_id == 'any') {
-    api.linked_any(req.params.relation).then(resultJson => {
+    api.linked_any(req.params.relation, req.params.trace).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
   }else {
-    api.linked_from_node(req.params.node_id, req.params.relation).then(resultJson => {
+    api.linked_from_node(req.params.node_id, req.params.relation, req.params.trace).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
       res.end(resultJson);
     });
