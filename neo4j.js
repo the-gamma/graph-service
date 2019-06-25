@@ -178,6 +178,16 @@ function links_from_any_node(label_type, traceString){
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
+      const url = "http://localhost:8000/drWho/" + traceString + "/get_properties_as_csv"
+      const explore_prop_obj = {
+        name: "explore_properties",
+        trace:[],
+        returns:{
+          kind:"nested",
+          endpoint:"http://localhost:8897/providers/data/upload/" + encodeURIComponent(url) }
+      }
+      jsonString += JSON.stringify(explore_prop_obj) + ";";
+
 
         for (var i = 0; i < result.records.length; i++) {
           const singleRecord = result.records[i];

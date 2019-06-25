@@ -52,6 +52,11 @@ app.get('/drWho/:trace/linked_from_node/:node_id/:relation', function(req, res) 
   }
 });
 
+app.get('/drWho/:trace/get_properties_as_csv', function(req, res) {
+  res.setHeader('Content-Type', 'text/plain');
+  res.end("Actor,Salary\nMatt Smith,1000000\nSomeone Else,123");
+});
+
 //app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
 //    api.get_properties(req.params.node_id).then(resultJson => {
 //      res.setHeader('Content-Type', 'text/plain');
