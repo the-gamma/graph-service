@@ -179,6 +179,16 @@ function links_from_any_node(label_type, traceString){
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
+      const url = "http://localhost:8000/drWho/" + traceString + "/get_properties_as_csv"
+      const explore_prop_obj = {
+        name: "explore_properties",
+        trace:[],
+        returns:{
+          kind:"nested",
+          endpoint:"http://localhost:8897/providers/data/upload/" + encodeURIComponent(url) }
+      }
+      jsonString += JSON.stringify(explore_prop_obj) + ";";
+
 
         for (var i = 0; i < result.records.length; i++) {
           const singleRecord = result.records[i];
@@ -231,7 +241,6 @@ function links_from_node(node_id, traceString){
         }
         propertie_string.push(obj);
       }
-      console.log(propertie_string);
       var jsonString = "";
       const prop_obj = {
         name: "get_properties",
@@ -245,6 +254,16 @@ function links_from_node(node_id, traceString){
           endpoint:"/get_properties_of_node" }
       }
       jsonString += JSON.stringify(prop_obj) + ";";
+
+      const url = "http://localhost:8000/drWho/" + traceString + "/get_properties_as_csv"
+      const explore_prop_obj = {
+        name: "explore_properties",
+        trace:[],
+        returns:{
+          kind:"nested",
+          endpoint:"http://localhost:8897/providers/data/upload/" + encodeURIComponent(url) }
+      }
+      jsonString += JSON.stringify(explore_prop_obj) + ";";
 
 
         for (var i = 0; i < result.records.length; i++) {
@@ -386,13 +405,13 @@ function get_properties(traceString){
         }
         key_label.push(temp_arr);
       }
-      fs.writeFile("test.json", JSON.stringify(result), function(err) { })
+      //fs.writeFile("test.json", JSON.stringify(result), function(err) { })
       var jsonArray = result.records.map(record => {
         var obj = {};
         for (var j = 0; j < record.keys.length; j++) {
 
           for (var n in key_label[j]) {
-            var prop_name_list = Object.keys(record._fields[1].properties);
+            var prop_name_list = Object.keys(record._fields[j].properties);
             var arr = key_label[j];
             for(var i = 0, len = arr.length; i < len; i++) {
               arr[i] = arr[i].replace(record.keys[j].replace(/n/g, "node") + ".", '');
@@ -410,7 +429,7 @@ function get_properties(traceString){
         }
         return obj;
     });
-      fs.writeFile("test2.json", JSON.stringify(jsonArray), function(err) { })
+      //fs.writeFile("test2.json", JSON.stringify(jsonArray), function(err) { });
       return JSON.stringify(jsonArray);
   });
 });

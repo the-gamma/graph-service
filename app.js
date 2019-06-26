@@ -2,6 +2,30 @@ var app = require('express')();
 var http = require('http').createServer(app);
 //var io = require('socket.io')(http);
 var api = require('./neo4j');
+const fs = require('fs');
+
+
+function ConvertToCSV(objArray) {
+  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+  var str = '';
+
+  for (var i = 0; i < array.length; i++) {
+      var line = '';
+      for (var index in array[i]) {
+          if (line != '') line += ','
+          if (typeof(array[i][index]) == typeof("") && array[i][index].includes(",") ) {
+            line += array[i][index].replace(/,/g, ";"); // to fix the issue with comma in string, I replace all the comma by ;
+          }else {
+            line += array[i][index];
+          }
+
+      }
+
+        str += line + '\r\n';
+      }
+  return str;
+}
+
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -52,7 +76,12 @@ app.get('/drWho/:trace/linked_from_node/:node_id/:relation', function(req, res) 
   }
 });
 
-
+app.get('/drWho/:trace/get_properties_as_csv', function(req, res) {
+  api.get_properties(req.params.trace).then(resultJson => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(ConvertToCSV(resultJson));
+  });
+});
 
 
 
