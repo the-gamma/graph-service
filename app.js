@@ -52,12 +52,11 @@ app.get('/drWho/:trace/linked_from_node/:node_id/:relation', function(req, res) 
   }
 });
 
-//app.all('/drWho/get_properties_of_node/:node_id', function(req, res) {
-//    api.get_properties(req.params.node_id).then(resultJson => {
-//      res.setHeader('Content-Type', 'text/plain');
-//      res.end(resultJson);
-//    });
-//});
+
+
+
+
+
 app.all('/drWho/get_properties_of_node', function(req, res) {
   var trace = "";
   req.setEncoding('utf8');

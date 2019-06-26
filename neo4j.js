@@ -1,7 +1,9 @@
 const neo4j = require('neo4j-driver').v1;
 var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "azerty"));
 const session = driver.session();
-const fs = require('fs')
+const fs = require('fs');
+const _ = require('underscore');
+
 
 function constructDataQuery(traceString) {
   const trace = traceString.split('&')
@@ -163,7 +165,6 @@ function links_from_any_node(label_type, traceString){
         };
         propertie_string.push(obj);
       }
-      console.log(propertie_string);
       var jsonString = "";
       const prop_obj = {
         name: "get_properties",
@@ -363,29 +364,54 @@ function get_properties(traceString){
     const resultPromise = session.run(query, args);
     return resultPromise.then(result => {
       session.close();
-      var jsonArray = result.records.map(record => {
-      var obj = {};
-      for (var n in key) {
-        var prop_name_list = Object.keys(record._fields[0].properties);
-        var arr = key;
-        for(var i = 0, len = arr.length; i < len; i++) {
-          arr[i] = arr[i].replace(record.keys[0].replace(/n/g, "node") + ".", '');
-        }
-        if (prop_name_list.includes(arr[n])) {
-          if (typeof(record._fields[0].properties[arr[n]]) == typeof({})) {
-            obj[key[n]] = record._fields[0].properties[arr[n]].toNumber();
-          } else {
-            obj[key[n]] = record._fields[0].properties[arr[n]];
-          }
-
-        } else {
-          obj[key[n]] = 0 ;
-        }
+      var key_label = [];
+      for (var i = 0; i < key.length; i++) {
+        key_label.push(key[i].split('.'));
       }
-      return obj;
-    });
-      return JSON.stringify(jsonArray);
+      var key_label_obj = [];
+      for (var i = 0; i < key.length; i++) {
+        var temp_obj = {
+          'node' : key_label[i][0],
+          'key' : key_label[i][1],
+        };
+        key_label_obj.push(temp_obj);
+      }
+      var grouped = _.mapObject(_.groupBy(key_label_obj, 'node'),
+                          clist => clist.map(a => _.omit(a, 'node')));
+      key_label = [];
+      for (var i = 0; i < Object.keys(grouped).length; i++) {
+        var temp_arr = [];
+        for (var j = 0; j < grouped[Object.keys(grouped)[i]].length; j++) {
+          temp_arr.push(grouped[Object.keys(grouped)[i]][j].key);
+        }
+        key_label.push(temp_arr);
+      }
+      fs.writeFile("test.json", JSON.stringify(result), function(err) { })
+      var jsonArray = result.records.map(record => {
+        var obj = {};
+        for (var j = 0; j < record.keys.length; j++) {
 
+          for (var n in key_label[j]) {
+            var prop_name_list = Object.keys(record._fields[1].properties);
+            var arr = key_label[j];
+            for(var i = 0, len = arr.length; i < len; i++) {
+              arr[i] = arr[i].replace(record.keys[j].replace(/n/g, "node") + ".", '');
+            }
+            if (prop_name_list.includes(arr[n])) {
+              if (typeof(record._fields[j].properties[arr[n]]) == typeof({})) {
+                obj[j+"-"+ key_label[j][n]] = record._fields[j].properties[arr[n]].toNumber();
+              } else {
+                obj[j+"-"+key_label[j][n]] = record._fields[j].properties[arr[n]];
+              }
+            } else {
+              obj[j+"-"+key_label[j][n]] = 0 ;
+            }
+          }
+        }
+        return obj;
+    });
+      fs.writeFile("test2.json", JSON.stringify(jsonArray), function(err) { })
+      return JSON.stringify(jsonArray);
   });
 });
 
