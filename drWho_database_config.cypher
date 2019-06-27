@@ -1,23 +1,17 @@
-//add label properties to all nodes
-MATCH (n)
-SET n.label = labels(n)[0]
-
-//set name properties to all nodes
-
-MATCH (a { label: 'Character' })
+MATCH (a:Character)
 SET a.name = a.character
-
-MATCH (b { label: 'Episode' })
-SET b.name = b.title
-
-MATCH (c { label: 'Actor' })
-SET c.name = c.actor
-
-MATCH (d { label: 'Planet' })
-SET d.name = d.planet
-
-MATCH (e { label: 'Species' })
-SET e.name = e.species
-
-MATCH (f { label: 'Thing' })
-SET f.name = f.thing
+;
+MATCH (a:Episode)
+SET a.name = a.title
+;
+MATCH (a:Actor)
+SET a.name = a.actor
+;
+MATCH (a:Planet)
+SET a.name = a.planet
+;
+MATCH (a:Species)
+SET a.name = a.species
+;
+MATCH (a:Thing)
+SET a.name = a.thing
