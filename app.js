@@ -103,7 +103,7 @@ app.all('/drWho/get_properties_of_node', function(req, res) {
 
 
 
-
-http.listen(8000, function(){
-  console.log('listening on *:8000');
+var port = process.env.port || 8000;
+http.listen(port, function(){
+  console.log('Listening on port: ', port);
 });
