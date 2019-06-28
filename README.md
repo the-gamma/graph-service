@@ -11,7 +11,7 @@ To run it localy:
 
 - Then you will need to set up the drWho database so it can work with the service. To do that, you will need to allow multiple query in the setting of neo4j and then run the script drWho_database_config.cypher .
 
-- You will also need to download all the library of the service, to do that just use `npm install` 
+- You will also need to download all the libraries to run the service, to do that just use `npm install` 
 
 ## Run it
 
