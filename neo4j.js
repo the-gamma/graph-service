@@ -9,7 +9,9 @@ try {
   config = {
     NEO4J_PASSWORD: process.env.NEO4J_PASSWORD,
     NEO4J_URL: process.env.NEO4J_URL,
-    NEO4J_USER: process.env.NEO4J_USER }
+    NEO4J_USER: process.env.NEO4J_USER,
+    GRAPH_SERVICE: process.env.GRAPH_SERVICE,
+    GALLERY_SERVICE: process.env.GALLERY_SERVICE }
 }
 const driver = neo4j.driver(config.NEO4J_URL, neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD));
 const session = driver.session();
