@@ -12,7 +12,7 @@ function ConvertToCSV(objArray,keys) {
   for (var key in keys) {
     lines += keys[key] +','
   }
-  lines.substring(0, lines.length - 1);
+  lines = lines.substring(0, lines.length - 1);
   str += lines + '\r\n';
   for (var i = 0; i < array.length; i++) {
       var line = '';
@@ -28,7 +28,7 @@ function ConvertToCSV(objArray,keys) {
 
         str += line + '\r\n';
       }
-  console.log(str);
+  fs.writeFile("test.csv", str, function(err) { });
   return str;
 }
 
@@ -82,7 +82,7 @@ app.get('/drWho/:trace/linked_from_node/:node_id/:relation', function(req, res) 
   }
 });
 
-app.get('/drWho/:trace/get_properties_as_csv', function(req, res) {
+app.get('/drWho/:trace/get_propertiescsv', function(req, res) {
   api.get_properties(req.params.trace).then(resultJson => {
     res.setHeader('Content-Type', 'text/plain');
     res.end(ConvertToCSV(resultJson[0], resultJson[1]));

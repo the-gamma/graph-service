@@ -179,7 +179,7 @@ function links_from_any_node(label_type, traceString){
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
-      const url = "http://localhost:8000/drWho/" + traceString + "/get_properties_as_csv"
+      const url = "http://localhost:8000/drWho/" + traceString + "/get_propertiescsv"
       const explore_prop_obj = {
         name: "explore_properties",
         trace:[],
@@ -255,7 +255,7 @@ function links_from_node(node_id, traceString){
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
-      const url = "http://localhost:8000/drWho/" + traceString + "/get_properties_as_csv"
+      const url = "http://localhost:8000/drWho/" + traceString + "/get_propertiescsv"
       const explore_prop_obj = {
         name: "explore_properties",
         trace:[],
@@ -404,7 +404,9 @@ function get_properties(traceString){
           temp_arr.push(grouped[Object.keys(grouped)[i]][j].key);
         }
         key_label.push(temp_arr);
+
       }
+
       //fs.writeFile("test.json", JSON.stringify(result), function(err) { })
       var jsonArray = result.records.map(record => {
         var obj = {};
@@ -421,16 +423,22 @@ function get_properties(traceString){
                 obj[j+"-"+ key_label[j][n]] = record._fields[j].properties[arr[n]].toNumber();
               } else {
                 obj[j+"-"+key_label[j][n]] = record._fields[j].properties[arr[n]];
+
               }
             } else {
               obj[j+"-"+key_label[j][n]] = 0 ;
+
             }
           }
         }
+
         return obj;
     });
+      //console.log(key_label_csv);
       //fs.writeFile("test2.json", JSON.stringify(jsonArray), function(err) { });
-      return [JSON.stringify(jsonArray), res[0]];
+      //console.log(Object.keys(jsonArray[0]));
+      return [JSON.stringify(jsonArray), Object.keys(jsonArray[0])];
+;
   });
 });
 
