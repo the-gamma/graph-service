@@ -20,4 +20,4 @@ Then to run it you can just type `node app.js`. Then if you want to visualise it
 
 ## Things to come and more information
 
-Shortly, we will try to run it on a server so it would be easier to use it. Also, shortly, we will try to add new databases to this service as the panama-papers database. You can also find more information on this service in the report which is in the publication folder of this repository.
+Shortly, we will try to run it on a server so it would be easier to use it. Also, shortly, we will try to add new databases to this service as the panama-papers database. You can also find more information on this service in the report which is in the publication folder of this repository. Also here is the link of the slides of the presentation of this service https://prezi.com/p/uahizyttz32s/transparent-data-visualizationof-graph-databases-with-the-gamma/ 
