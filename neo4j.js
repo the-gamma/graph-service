@@ -47,8 +47,6 @@ function constructDataQuery(traceString) {
   return ['MATCH ' + query + ' WHERE ' + conditions + ' RETURN ' + returns, args];
 }
 
-//var [query, args] = constructDataQuery("Character&Doctor&ENEMY_OF&[any]&APPEARED_IN&[any]")
-
 
 
 function list_of_key_and_type(traceString){
@@ -418,7 +416,7 @@ function get_properties(traceString){
 
       }
 
-      //fs.writeFile("test.json", JSON.stringify(result), function(err) { })
+
       var jsonArray = result.records.map(record => {
         var obj = {};
         for (var j = 0; j < record.keys.length; j++) {
@@ -445,9 +443,7 @@ function get_properties(traceString){
 
         return obj;
     });
-      //console.log(key_label_csv);
       //fs.writeFile("test2.json", JSON.stringify(jsonArray), function(err) { });
-      //console.log(Object.keys(jsonArray[0]));
       return [JSON.stringify(jsonArray), Object.keys(jsonArray[0])];
 ;
   });

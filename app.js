@@ -1,9 +1,7 @@
 var app = require('express')();
 var http = require('http').createServer(app);
-//var io = require('socket.io')(http);
 var api = require('./neo4j');
 const fs = require('fs');
-// drWho.Character.'[any]'.'APPEARED_IN'.'[any]'.'explore_properties'.explore.'group data'.'by Rose Tyler'.'count distinct Journey's End'
 
 function ConvertToCSV(objArray,keys) {
   var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
@@ -28,7 +26,6 @@ function ConvertToCSV(objArray,keys) {
 
         str += line + '\r\n';
       }
-  fs.writeFile("test.csv", str, function(err) { });
   return str;
 }
 
@@ -104,13 +101,6 @@ app.all('/drWho/get_properties_of_node', function(req, res) {
   });
 });
 
-
-
-
-
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/Index.html');
-});
 
 
 
