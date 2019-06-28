@@ -1,9 +1,18 @@
 const neo4j = require('neo4j-driver').v1;
-var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "azerty"));
-const session = driver.session();
 const fs = require('fs');
 const _ = require('underscore');
 
+var config = null;
+try {
+  config = JSON.parse(fs.readFileSync("config.json"))
+} catch {
+  config = {
+    NEO4J_PASSWORD: process.env.NEO4J_PASSWORD,
+    NEO4J_URL: process.env.NEO4J_URL,
+    NEO4J_USER: process.env.NEO4J_USER }
+}
+const driver = neo4j.driver(config.NEO4J_URL, neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD));
+const session = driver.session();
 
 function constructDataQuery(traceString) {
   const trace = traceString.split('&')
@@ -255,13 +264,13 @@ function links_from_node(node_id, traceString){
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
-      const url = "http://localhost:8000/drWho/" + traceString + "/get_properties_as_csv"
+      const url = config.GRAPH_SERVICE + "/drWho/" + traceString + "/get_properties_as_csv"
       const explore_prop_obj = {
         name: "explore_properties",
         trace:[],
         returns:{
           kind:"nested",
-          endpoint:"http://localhost:8897/providers/data/upload/" + encodeURIComponent(url) }
+          endpoint:config.GALLERY_SERVICE + "/providers/data/upload/" + encodeURIComponent(url) }
       }
       jsonString += JSON.stringify(explore_prop_obj) + ";";
 
