@@ -3,12 +3,17 @@ var http = require('http').createServer(app);
 //var io = require('socket.io')(http);
 var api = require('./neo4j');
 const fs = require('fs');
+// drWho.Character.'[any]'.'APPEARED_IN'.'[any]'.'explore_properties'.explore.'group data'.'by Rose Tyler'.'count distinct Journey's End'
 
-
-function ConvertToCSV(objArray) {
+function ConvertToCSV(objArray,keys) {
   var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
   var str = '';
-
+  var lines = '';
+  for (var key in keys) {
+    lines += keys[key] +','
+  }
+  lines.substring(0, lines.length - 1);
+  str += lines + '\r\n';
   for (var i = 0; i < array.length; i++) {
       var line = '';
       for (var index in array[i]) {
@@ -23,6 +28,7 @@ function ConvertToCSV(objArray) {
 
         str += line + '\r\n';
       }
+  console.log(str);
   return str;
 }
 
@@ -79,7 +85,7 @@ app.get('/drWho/:trace/linked_from_node/:node_id/:relation', function(req, res) 
 app.get('/drWho/:trace/get_properties_as_csv', function(req, res) {
   api.get_properties(req.params.trace).then(resultJson => {
     res.setHeader('Content-Type', 'text/plain');
-    res.end(ConvertToCSV(resultJson));
+    res.end(ConvertToCSV(resultJson[0], resultJson[1]));
   });
 });
 
@@ -93,7 +99,7 @@ app.all('/drWho/get_properties_of_node', function(req, res) {
   req.on('end', function() {
     api.get_properties(trace).then(resultJson => {
       res.setHeader('Content-Type', 'text/plain');
-      res.end(resultJson);
+      res.end(resultJson[0]);
     });
   });
 });

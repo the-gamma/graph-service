@@ -430,7 +430,7 @@ function get_properties(traceString){
         return obj;
     });
       //fs.writeFile("test2.json", JSON.stringify(jsonArray), function(err) { });
-      return JSON.stringify(jsonArray);
+      return [JSON.stringify(jsonArray), res[0]];
   });
 });
 
