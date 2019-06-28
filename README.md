@@ -7,7 +7,7 @@ To run it localy:
 
 - You need to download the neo4j environement https://neo4j.com/ and to run the drWho database available here https://neo4j.com/developer/example-data/. 
 
-- You will also need to run the gallery-csv-service: https://github.com/the-gamma/gallery-csv-service . To run it localy you will also need to add the config.fsx file in the src folder before building it.
+- You will also need to run the gallery-csv-service: https://github.com/the-gamma/gallery-csv-service .
 
 - Then you will need to set up the drWho database so it can work with the service. To do that, you will need to allow multiple query in the setting of neo4j and then run the script drWho_database_config.cypher .
 
