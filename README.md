@@ -1,4 +1,4 @@
-# graph-service
+# Graph-service
 
 This service has for objective to allow The Gamma to handle Neo4j graph databases. This service with both the REST and the PIVOT type provider. 
 
