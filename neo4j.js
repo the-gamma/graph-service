@@ -188,13 +188,13 @@ function links_from_any_node(label_type, traceString){
       }
       jsonString += JSON.stringify(prop_obj) + ";";
 
-      const url = "http://localhost:8000/drWho/" + traceString + "/get_propertiescsv"
+      const url = config.GRAPH_SERVICE + "/drWho/" + traceString + "/get_propertiescsv"
       const explore_prop_obj = {
         name: "explore_properties",
         trace:[],
         returns:{
           kind:"nested",
-          endpoint:"http://localhost:8897/providers/data/upload/" + encodeURIComponent(url) }
+          endpoint: config.GALLERY_SERVICE + "/providers/data/upload/" + encodeURIComponent(url) }
       }
       jsonString += JSON.stringify(explore_prop_obj) + ";";
 
